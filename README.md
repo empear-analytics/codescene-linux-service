@@ -6,21 +6,71 @@ With CodeScene as a Linux service, systemd will take care of:
 * Automatic restart after server reboot.
 * Automatic restart if the CodeScene service is killed.
 
+
+## Installation
+
+- Copy the `codescene.service` file to the `/etc/systemd/system`.
+- Choose or create a user that the service will run as.
+- Copy the `codescene-enterprise-edition.standalone.jar` to a directory accessible by the user. 
+- Make sure the JAR file is accessible to the user.
+- Complete the configuration below.
+- Run `systemctl daemon-reload` to make systemd aware of the new service.
+- Run `systemctl start codescene` to test.
+- Navigate to `localhost:3003` to verify that CodeScene is
+  running. You may have to wait a few seconds.
+- If you want CodeScene to automatically start when the system starts, run `systemctl enable codescene`.
+
+
 ## Mandatory Configuration
 
-To use this script, make sure you create a codescene user and specify that system user in the `User` field.
+### User
 
-Note that the system user you creates needs to have SSH credentials in their home directory.
+To use this script, make sure you create a `codescene` user. If you wish
+to use a different system user, specify that user in the `User`
+field. In this case, you will need to adjust several paths in the
+configuration items below.
+
+Note that the system user needs to have SSH credentials in their home directory.
+
+### ExecStart path
+
+We recommend placing the CodeScene JAR file in `/home/codescene`, if
+you have defined a `codescene` user. For any other location, the
+`ExecStart` line in `codescene.service` should point to that location.
+
+### ExecStart Memory settings
+
+If you analyse large applications with deep history, then you might
+also want to increase the default `-Xmx8g` JVM memory option to
+specify a larger maximum heap size.
+
+### Java executable
+
+Depending on your distribution, you may need to adjust the path to the
+Java command.
+
+### Database location
+
+The configuration file also sets an environment variable for CodeScene's database:
+
+    Environment=CODESCENE_DB_PATH=/home/codescene/codescene-db
+
+Make sure that the `/home/codescene` part of this path exists and is
+writable by the user.
+
 
 ## Optional Configuration
 
-Depending on your environment, you might want to change the following options in the script:
+By default, `StartLimitIntervalSec` is set to `0`. This means that
+systemd will attempt to restart the CodeScene service forever. If
+you remove this option, systemd will give up after 5 failed
+attempts.
 
-* `ExecStart`: This command is used to launch your CodeScene instance. You might have to use an absolute path for
-  the `codescene-enterprise-edition.standalone.jar` JAR file. If you analyse large applications with deep history, then
-  you might also want to increase the default `-Xmx8g` JVM memory option to specify a larger maximum heap size.
-* `StartLimitIntervalSec=0`: This option means that systemd will attempt to restart the CodeScene service forever. If you
-  remove this option, systemd will give up after 5 failed attempts.
+## Debugging
+
+Logs are available with the `journalctl -u codescene` command. You can
+also run `systemctl status codescene`.
+
 
 ## About CodeScene
 

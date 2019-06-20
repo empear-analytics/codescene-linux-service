@@ -8,7 +8,8 @@ Type=simple
 Restart=always
 RestartSec=1
 User=codescene
-ExecStart=/bin/java -Xms5128m -Xmx8g -jar codescene-enterprise-edition.standalone.jar
+Environment=CODESCENE_DB_PATH=/home/codescene/codescene-db
+ExecStart=/bin/java -Xms5128m -Xmx8g -jar /home/codescene/codescene-enterprise-edition.standalone.jar
 
 [Install]
 WantedBy=multi-user.target
