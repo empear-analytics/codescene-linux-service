@@ -1,0 +1,14 @@
+[Unit]
+Description=CodeScene behavioral code analysis tool
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=codescene
+ExecStart=/bin/java -Xms5128m -Xmx8g -jar codescene-enterprise-edition.standalone.jar
+
+[Install]
+WantedBy=multi-user.target
